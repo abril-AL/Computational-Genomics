@@ -215,3 +215,4 @@ def frequent_words_with_mismatches(text: str, k: int, d: int) -> list[str]:
 
 # Frequent Words with Mismatches and Reverse Complements Problem
 def frequent_words_mismatches_reverse_complements(text: str, k: int, d: int) -> list[str]:
+    pass    
