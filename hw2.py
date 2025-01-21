@@ -102,43 +102,5 @@ def trie_matching(text: str, patterns: List[str]) -> Dict[str, List[int]]:
 trie_matching( "AATCGGGTTCAATCGGGGT", ["ATCG"] )
 
 
-# 9.5 Suffix Trees
+# 9.5 Suffix Trees (OPTIONAL)
  
-
-#Code Challenge: Solve the Suffix Tree Construction Problem.
-
-
-'''
-ModifiedSuffixTrieConstruction(Text)
-    Trie ← a graph consisting of a single node root
-    for i ← 0 to |Text| - 1
-        currentNode ← root
-        for j ← i to |Text| - 1
-            currentSymbol ← j-th symbol of Text
-            if there is an outgoing edge from currentNode labeled by currentSymbol
-                currentNode ← ending node of this edge
-            else
-                add a new node newNode to Trie
-                add an edge newEdge connecting currentNode to newNode in Trie
-                Symbol(newEdge) ← currentSymbol
-                Position(newEdge) ← j
-                currentNode ← newNode
-        if currentNode is a leaf in Trie
-            assign label i to this leaf
-    return Trie
-'''
-
-'''
-The following pseudocode constructs a suffix tree using the modified suffix trie constructed by ModifiedSuffixTrieConstruction(). 
-This algorithm will consolidate each non-branching path of the modified suffix trie into a single edge. 
-For more on non-branching paths, recall Charging Station: Maximal Non-Branching Paths in a Graph.
-
-ModifiedSuffixTreeConstruction(Text)
-    Trie ← ModifiedSuffixTrieConstruction
-    for each non-branching path Path in Trie
-        substitute Path by a single edge e connecting the first and last nodes of Path
-        Position(e) ← Position(first edge of Path)
-        Length(e) ← number of edges of Path
-    return Trie
-'''
-
