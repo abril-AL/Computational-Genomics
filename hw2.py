@@ -4,11 +4,25 @@
 #   9.3, 9.5, 9.6, 9.7   #
 #                        #      
 ##########################
+'''
+9.3. Herding Patterns into a Trie: Q4
+
+9.5. Suffix Trees: Q4, Q5 (both Q4 and Q5 are extra credit for undergraduates; required for graduate students)
+
+9.6. Suffix Arrays: Q2
+
+9.7. The Burrows-Wheeler Transform: Q5
+
+9.9. The First-Last Property and Burrows-Wheeler Inversion: Q11* (recommended)
+
+9.10. Pattern Matching with the Burrows-Wheeler Transform: Q8* (recommended)
+
+9.11. Speeding Up Burrows-Wheeler Pattern Matching: Q7* (recommended)
+'''
 
 # 9.3 Herding Patterns into a Trie
-
-
 # Code Challenge: Solve the Trie Construction Problem.
+
 '''
 TrieConstruction(Patterns)
     Trie ← a graph consisting of a single node root
@@ -99,8 +113,32 @@ def trie_matching(text: str, patterns: List[str]) -> Dict[str, List[int]]:
     return res
 
 #print(prefixMathcing("AB", [(0, 1, 'A'), (1, 2, 'B'), (0,3,'C')]))
-trie_matching( "AATCGGGTTCAATCGGGGT", ["ATCG"] )
+#trie_matching( "AATCGGGTTCAATCGGGGT", ["ATCG"] )
 
 
 # 9.5 Suffix Trees (OPTIONAL)
  
+# 9.6 Suffix Arrays
+def suffix_array(text: str) -> List[int]:
+    """
+    Generate the suffix array for the given text.
+    """
+    all_suffs = [(text[i:],i) for i in range(len(text))]
+    all_suffs.sort()
+    all_suffs = [tup[1] for tup in all_suffs]
+    return all_suffs
+
+#print(suffix_array("AACGATAGCGGTAGA$"))
+
+# 9.7 The Burrows-Wheeler Transform
+
+def burrows_wheeler_transform(text: str) -> str:
+    """
+    Generate the Burrows-Wheeler Transform of the given text.
+    """
+    all_suffs = [(text[i:] + text[:i],i) for i in range(len(text))]
+    all_suffs.sort()
+    last = [tup[0][-1] for tup in all_suffs]
+    return ''.join(last)
+
+print(burrows_wheeler_transform("GCGTGCCTGGTCA$"))
