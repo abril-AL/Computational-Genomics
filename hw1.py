@@ -3,6 +3,33 @@
 ###############
 
 import sys
+# 1.2 Hidden Messages in the Replication Origin
+def frequent_words(text: str, k: int) -> list[str]:
+    # Given text and len of k-mer, return lst of freq k-mers
+    
+    # Build map of k-mer patters and freq
+    dict = {}
+    for i in range(0,len(text) - k +1):
+        sub = text[i:i+k]
+        if sub in dict:
+            dict[sub] += 1
+        else:
+            dict[sub] = 1
+    
+    # Find max cnt
+    max = 0
+    for kmer in dict:
+        if dict[kmer] > max:
+            max = dict[kmer]
+            
+    # Add each kmer w that count to res
+    res = []
+    for kmer in dict:
+        if dict[kmer] is max:
+            res.append(kmer)
+    
+    return res
+
 
 # 1.3 Some Hidden Messages are More Surprising than Others
 # Insert your reverse_complement function here, along with any subroutines you need
