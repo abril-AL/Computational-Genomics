@@ -44,7 +44,7 @@ def de_bruijn_string(text: str, k: int) -> Dict[str, List[str]]:
     
     return adj_list
 
-print(de_bruijn_string("ACGTGTATA",3))
+#print(de_bruijn_string("ACGTGTATA",3))
 
 #ACGTGTATA =>
 #AC: CG
@@ -55,5 +55,31 @@ print(de_bruijn_string("ACGTGTATA",3))
 #TG: GT
 
 #3.5. Walking in the de Bruijn Graph: Q8
+        
+    # Q8: Construct the de Bruijn graph from a set of k-mers.
+def de_bruijn_kmers(k_mers: List[str]) -> Dict[str, List[str]]:
+    """Forms the de Bruijn graph of a collection of k-mers."""
+    k = len(k_mers[0])
+    res = {}
+
+    for kmer in k_mers:
+        pre = kmer[:-1]
+        suf = kmer[1:]
+
+        if pre not in res:
+            res[pre] = []
+        res[pre].append(suf)
+        
+    return res
+
+print(de_bruijn_kmers(["GAGG", "CAGG", "GGGG", "GGGA", "CAGG", "AGGG", "GGAG"]))
+
+
+#GAGG CAGG GGGG GGGA CAGG AGGG GGAG
+#AGG: GGG
+#CAG: AGG AGG
+#GAG: AGG
+#GGA: GAG
+#GGG: GGA GGG
 
 #3.8. From Euler's Theorem to an Algorithm for Finding Eulerian Cycles: Q2, Q6, Q7
