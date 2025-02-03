@@ -1,7 +1,7 @@
-#3.2. The String Reconstruction Problem: Q3
-
 import sys
 from typing import List, Dict, Iterable
+
+#3.2. The String Reconstruction Problem: Q3
 
 def kmer_composition(text: str, k: int) -> Iterable[str]:
     """Forms the k-mer composition of a string."""
@@ -15,6 +15,16 @@ def genome_path(path: List[str]) -> str:
     return path[0] + ''.join([elem[-1] for elem in path[1:]])
 #print(genome_path(['ACCGA', 'CCGAA', 'CGAAG', 'GAAGC', 'AAGCT'])) # should return ACCGAAGCT
 
+    # Q10: Overlap Graph Problem 
+def overlap_graph(patterns: List[str]) -> Dict[str, List[str]]:
+    """Forms the overlap graph of a collection of patterns."""
+    res = {}
+    for p in patterns: 
+        s = list(set([nxt for nxt in patterns if  (p[1:] == nxt[:-1])])) # (nxt is not p) and
+        if s:
+            res[p] = s
+    return res
+#print(overlap_graph(['AAG', 'AGA', 'ATT', 'CTA', 'CTC', 'GAT', 'TAC', "TCT", "TCT", "TTC"]))
 
 #3.4. Another Graph for String Reconstruction: Q6
 
