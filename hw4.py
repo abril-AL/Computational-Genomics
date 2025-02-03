@@ -72,8 +72,7 @@ def de_bruijn_kmers(k_mers: List[str]) -> Dict[str, List[str]]:
         
     return res
 
-print(de_bruijn_kmers(["GAGG", "CAGG", "GGGG", "GGGA", "CAGG", "AGGG", "GGAG"]))
-
+#print(de_bruijn_kmers(["GAGG", "CAGG", "GGGG", "GGGA", "CAGG", "AGGG", "GGAG"]))
 
 #GAGG CAGG GGGG GGGA CAGG AGGG GGAG
 #AGG: GGG
@@ -83,3 +82,58 @@ print(de_bruijn_kmers(["GAGG", "CAGG", "GGGG", "GGGA", "CAGG", "AGGG", "GGAG"]))
 #GGG: GGA GGG
 
 #3.8. From Euler's Theorem to an Algorithm for Finding Eulerian Cycles: Q2, Q6, Q7
+
+# Q2: Eulerian Cycle Problem
+'''EulerianCycle(Graph)
+    form a cycle Cycle by randomly walking in Graph (don't visit the same edge twice!)
+    while there are unexplored edges in Graph
+        select a node newStart in Cycle with still unexplored edges
+        form Cycle’ by traversing Cycle (starting at newStart) and then randomly walking 
+        Cycle ← Cycle’
+    return Cycle'''
+
+# g[u] is the list of neighbors of the vertex u
+def eulerian_cycle(g: Dict[int, List[int]]) -> Iterable[int]:
+    """Constructs an Eulerian cycle in a graph."""
+    graph = {u: list(neighbors) for u, neighbors in g.items()}
+    #print("G:",graph)
+    
+    stack = [next(iter(graph))]  # Start with the first vertex
+    cycle = []
+
+    while stack:
+        u = stack[-1]
+        if graph[u]:  # if unvisited edges from u
+            v = graph[u].pop()  # walk the edge u -> v
+            stack.append(v)
+        else:
+            cycle.append(stack.pop())  # add to cylcle
+
+    return cycle[::-1]
+    
+graph = {
+    0: [3],
+    1: [0],
+    2: [1, 6],
+    3: [2],
+    4: [2],
+    5: [4],
+    6: [5, 8],
+    7: [9],
+    8: [7],
+    9: [6]
+}
+
+print(eulerian_cycle(graph))
+
+#0: 3
+#1: 0
+#2: 1 6
+#3: 2
+#4: 2
+#5: 4
+#6: 5 8
+#7: 9
+#8: 7
+#9: 6
+# 0 3 2 6 8 7 9 6 5 4 2 1 0
