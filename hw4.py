@@ -99,7 +99,7 @@ def eulerian_cycle(g: Dict[int, List[int]]) -> Iterable[int]:
     #print("G:",graph)
     
     stack = [next(iter(graph))]  # Start with the first vertex
-    print("s:",stack)
+    #print("s:",stack)
     cycle = []
 
     while stack:
@@ -169,6 +169,8 @@ def eulerian_path(adj_dict):
             end_node = node
         elif in_d - out_d != 0:
             raise Exception("Graph is not Eulerian")
+    if start_node == None and end_node == None:
+        return eulerian_cycle(adj_dict)
 
     #print("Start node:", start_node) # 6
     #print("End node:", end_node) # 4
@@ -194,4 +196,30 @@ def eulerian_path(adj_dict):
 
     return path[::-1]
 
-print(eulerian_path(g2))
+#print(eulerian_path(g2))
+
+# Q7: String Reconstruction Problem
+# -> reduces to finding eulerian path in the debruijn graph generated from reads
+'''StringReconstruction(Patterns)
+    dB ← DeBruijn(Patterns)
+    path ← EulerianPath(dB)
+    Text ← PathToGenome(path)
+    return Text
+'''
+def string_reconstruction(patterns: List[str], k: int) -> str:
+    """Reconstructs a string from its k-mer composition."""
+    db = de_bruijn_kmers(patterns)
+    print("db:",db)
+    path = eulerian_path(db)
+    print('p',path)
+    if k > 2:
+        return path[0] + ''.join([ s[k-2:] for s in path[1:] ] )
+    else:
+        #print('here')
+        return path[0] + ''.join([ s for s in path[1:] ] )
+
+print(string_reconstruction(["ACG", "CGT", "GTG", "TGT", "GTA", "TAT", "ATA"],3))
+print(string_reconstruction(['GG','AC','GA','CT'],2))
+print(string_reconstruction(['CTAC', 'CTCC', 'TCCT', 'ACTC', 'CCTC', 'CCTA', 'TACT'],4))
+print(string_reconstruction(['ACG', 'CGT', 'GTA', 'TAC'],3))
+print(string_reconstruction(['ACG', 'CGT', 'GTA', 'TAC'],3))
