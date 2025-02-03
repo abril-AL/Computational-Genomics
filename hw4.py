@@ -28,6 +28,32 @@ def overlap_graph(patterns: List[str]) -> Dict[str, List[str]]:
 
 #3.4. Another Graph for String Reconstruction: Q6
 
+    # Q6: De Bruijn Graph from a String Problem
+def de_bruijn_string(text: str, k: int) -> Dict[str, List[str]]:
+    """Forms the de Bruijn graph of a string."""    
+    adj_list = {} # str: [ ..., ..., ...  ] 
+    
+    for i in range(0,len(text)-k+1):
+        kmer = text[i:i+k]
+        pre = kmer[:-1]
+        suf = kmer[1:]
+
+        if pre not in adj_list:
+            adj_list[pre] = []
+        adj_list[pre].append(suf) 
+    
+    return adj_list
+
+print(de_bruijn_string("ACGTGTATA",3))
+
+#ACGTGTATA =>
+#AC: CG
+#AT: TA
+#CG: GT
+#GT: TA TG
+#TA: AT
+#TG: GT
+
 #3.5. Walking in the de Bruijn Graph: Q8
 
 #3.8. From Euler's Theorem to an Algorithm for Finding Eulerian Cycles: Q2, Q6, Q7
