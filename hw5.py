@@ -76,6 +76,37 @@ def lloyd(k: int, m: int, data: List[Tuple[float, ...]]) -> List[Tuple[float, ..
     return sorted(centers)  # Ensure correct order of centers
 # this works but cogniterra is annoying and wont permute answers or allow rounding by more than .001
 
+# lloyd that is accepted online:
+from typing import List, Tuple 
+from collections import defaultdict 
+def euclidean_distance_squared(point1: Tuple[float, ...], point2: Tuple[float, ...]) -> float: 
+    """Computes the squared Euclidean distance between two points.""" 
+    return sum((p1 - p2) ** 2 for p1, p2 in zip(point1, point2)) 
+def compute_centroid(cluster: List[Tuple[float, ...]]) -> Tuple[float, ...]: 
+    """Computes the centroid (mean point) of a cluster.""" 
+    m = len(cluster[0]) # Dimensionality 
+    return tuple(sum(point[i] for point in cluster) / len(cluster) for i in range(m)) 
+def lloyd(k: int, m: int, data: List[Tuple[float, ...]]) -> List[Tuple[float, ...]]: 
+    """ Implement Lloyd's algorithm for k-means clustering. """ 
+    # Initialize the first k centers as the first k points in the dataset 
+    centers = data[:k] 
+    while True: 
+        # Create clusters 
+        clusters = defaultdict(list) 
+        for point in data: 
+            # Assign point to the nearest center 
+            closest_center = min(centers, key=lambda c: euclidean_distance_squared(point, c)) 
+            clusters[closest_center].append(point) 
+            # Compute new centers 
+            new_centers = [compute_centroid(clusters[center]) for center in centers] 
+            # Check for convergence 
+            if new_centers == centers: 
+                break 
+            centers = new_centers # Update centers  
+        return centers
+
+
+
 # Hierarchical Clustering
 '''HierarchicalClustering(D, n)
     Clusters ← n single-element clusters labeled 1, ... , n 
