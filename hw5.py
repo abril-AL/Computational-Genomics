@@ -24,3 +24,17 @@ def farthest_first_traversal(k: int, m: int, data: List[Tuple[float, ...]]) -> L
         dataPoint = max(data, key=lambda point: min(math.dist(point, center) for center in centers))
         centers.add(dataPoint)
     return centers
+
+# k-Means Clustering
+
+def euclidean_distance(p1: Tuple[float, ...], p2: Tuple[float, ...]) -> float:
+    """Calculate the Euclidean distance between two points."""
+    return sum((x - y) ** 2 for x, y in zip(p1, p2)) ** 0.5
+
+def squared_error_distortion(k: int, m: int, centers: List[Tuple[float, ...]], data: List[Tuple[float, ...]]) -> float:
+    """Calculate the squared error distortion of the data points with respect to the given centers."""
+    accum = 0
+    for p in data:
+        close_center = min(centers, key=lambda c: euclidean_distance(c,p))
+        accum += euclidean_distance(close_center,p) ** 2
+    return (accum / len(data))
