@@ -32,3 +32,21 @@ def motif_enumeration(dna: list[str], k: int, d: int) -> list[str]:
     return sorted(patterns)
 #r = motif_enumeration(['ATTTGGC','TGCCTTA','CGGTATC','GAAAATT'],3,1)
 #print(r)
+
+# Profile-most Probable k-mer Problem
+def profile_most_probable_kmer(text: str, k: int,
+                               profile: list[dict[str, float]]) -> str:
+    """Identifies the most probable k-mer according to a given profile matrix.
+
+    The profile matrix is represented as a list of columns, where the i-th element is a map
+    whose keys are strings ("A", "C", "G", and "T") and whose values represent the probability
+    associated with this symbol in the i-th column of the profile matrix.
+    """
+    probs = [] 
+    for window in [text[i:i+k] for i in range(len(text)-k+1)]:
+        prob = 1
+        for (n,i) in zip(window,range(len(window))):
+            prob = prob * profile[i][n]
+        probs.append(prob)
+    max_prob_index = probs.index(max(probs))
+    return text[max_prob_index:max_prob_index + k]
