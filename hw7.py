@@ -272,3 +272,87 @@ print("\t", "\t".join(states))
 for i in range(len(x)):
     print(f"{soft_decoding_probs[i, 0]:.4f}\t{soft_decoding_probs[i, 1]:.4f}")
 '''
+
+# 10.13. Baum-Welch Learning
+
+def forward_algorithm(x, sigma, states, transition_matrix, emission_matrix):
+    num_states = len(states)
+    T = len(x)
+    
+    forward = np.zeros((T, num_states))
+    
+    for k in range(num_states):
+        forward[0, k] = emission_matrix[k, sigma.index(x[0])]
+    
+    for i in range(1, T):
+        for k in range(num_states):
+            forward[i, k] = sum(forward[i-1, j] * transition_matrix[j, k] for j in range(num_states)) * emission_matrix[k, sigma.index(x[i])]
+    
+    return forward
+
+def backward_algorithm(x, sigma, states, transition_matrix, emission_matrix):
+    num_states = len(states)
+    T = len(x)
+    
+    backward = np.zeros((T, num_states))
+    backward[T-1, :] = 1  # init
+    
+    for i in range(T-2, -1, -1):
+        for k in range(num_states):
+            backward[i, k] = sum(transition_matrix[k, j] * emission_matrix[j, sigma.index(x[i+1])] * backward[i+1, j] for j in range(num_states))
+    
+    return backward
+
+def baum_welch(x, sigma, states, transition_matrix, emission_matrix, num_iterations):
+    num_states = len(states)
+    T = len(x)
+    
+    for iteration in range(num_iterations):
+        forward_probs = forward_algorithm(x, sigma, states, transition_matrix, emission_matrix)
+        backward_probs = backward_algorithm(x, sigma, states, transition_matrix, emission_matrix)
+
+        # gamma and xi
+        xi = np.zeros((T - 1, num_states, num_states))
+        gamma = np.zeros((T, num_states))
+
+        for i in range(T - 1):
+            denom = sum(forward_probs[i, a] * transition_matrix[a, b] * emission_matrix[b, sigma.index(x[i+1])] * backward_probs[i+1, b]
+                        for a in range(num_states) for b in range(num_states))
+
+            for a in range(num_states):
+                gamma[i, a] = sum(forward_probs[i, a] * transition_matrix[a, b] * emission_matrix[b, sigma.index(x[i+1])] * backward_probs[i+1, b]
+                                  for b in range(num_states)) / denom
+
+                for b in range(num_states):
+                    xi[i, a, b] = (forward_probs[i, a] * transition_matrix[a, b] * emission_matrix[b, sigma.index(x[i+1])] * backward_probs[i+1, b]) / denom
+
+        gamma[T - 1, :] = forward_probs[T - 1, :] * backward_probs[T - 1, :] / np.sum(forward_probs[T - 1, :] * backward_probs[T - 1, :])
+
+        # transition 
+        for a in range(num_states):
+            for b in range(num_states):
+                transition_matrix[a, b] = np.sum(xi[:, a, b]) / np.sum(gamma[:T-1, a])
+
+        # emission 
+        for a in range(num_states):
+            for symbol in range(len(sigma)):
+                emission_matrix[a, symbol] = np.sum(gamma[:, a] * (np.array([s == sigma[symbol] for s in x], dtype=int))) / np.sum(gamma[:, a])
+
+    return transition_matrix, emission_matrix
+
+num_iterations = 100
+x = "xzxxzzzzzzzyzxyxzyzzxzyzxxzxzyyzzyxyzxyyyxyyyyxxxzxxxyxzxxxyyzxzzxzzxxzxzzzyxyyzyyyxzxyyyyyxyxxxzzzy"
+sigma = ['x', 'y', 'z']
+states = ['A', 'B', 'C', 'D']
+transition_matrix = np.array([[0.192,0.156,0.339,0.314], [0.374,0.083,0.471,0.072],[0.241,0.415,0.341,0.003], [0.156,0.186,0.326,0.331]])
+emission_matrix = np.array([[0.079,0.673,0.248], [0.279,0.129,0.591], [0.445,0.248,0.306],[0.378,0.419,0.203]])
+
+transition_matrix, emission_matrix = baum_welch(x, sigma, states, transition_matrix, emission_matrix, num_iterations)
+
+print("\t", "\t".join(states))
+for i, row in enumerate(transition_matrix):
+    print(states[i], "\t", "\t".join(f"{val:.3f}" for val in row))
+print("--------")
+print("\t", "\t".join(sigma))
+for i, row in enumerate(emission_matrix):
+    print(states[i], "\t", "\t".join(f"{val:.3f}" for val in row))
