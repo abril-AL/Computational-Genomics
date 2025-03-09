@@ -135,4 +135,64 @@ emission = np.array([
 ])
 
 output = outcome_likelihood(x, alphabet, states, transition, emission)
-print(output)
+#print(output)
+
+# 10.11 Learning the Parameters of an HMM
+import numpy as np
+
+def hmm_parameter_estimation(x, sigma, pi, states):
+    sigma_to_idx = {symbol: idx for idx, symbol in enumerate(sigma)}
+    state_to_idx = {state: idx for idx, state in enumerate(states)}
+
+    num_states = len(states)
+    num_symbols = len(sigma)
+    
+    transition_matrix = np.zeros((num_states, num_states))
+    emission_matrix = np.zeros((num_states, num_symbols))
+
+    # transition    
+    for i in range(1, len(pi)):
+        prev_state_idx = state_to_idx[pi[i - 1]]
+        curr_state_idx = state_to_idx[pi[i]]
+        transition_matrix[prev_state_idx][curr_state_idx] += 1
+    
+    # emission 
+    for i in range(len(x)):
+        state_idx = state_to_idx[pi[i]]
+        symbol_idx = sigma_to_idx[x[i]]
+        emission_matrix[state_idx][symbol_idx] += 1
+    
+    # normalize transition
+    for i in range(num_states):
+        row_sum = np.sum(transition_matrix[i])
+        if row_sum > 0:
+            transition_matrix[i] /= row_sum
+        else:
+            # if no outgoing transitions, distribute evenly
+            transition_matrix[i] = 1.0 / num_states
+    
+    # normalize emission 
+    for i in range(num_states):
+        row_sum = np.sum(emission_matrix[i])
+        if row_sum > 0:
+            emission_matrix[i] /= row_sum
+        else:
+            #if no emissions, distribute evenly
+            emission_matrix[i] = 1.0 / num_symbols
+
+    return transition_matrix, emission_matrix
+
+x = "zyzzyzyyyyzzxyyyxzyzzyzxzxzzyzyxzyxzxzyyyyyyzzyzzxxyzzxxzxxxxzzxxxyxzxyxyxzxyyyzxyzzxzzzyyyxyxxyxxyy"
+sigma = ['x', 'y', 'z']
+pi = "BBAABBBAABABBABAAAABBBBABABBBAAABBAABAAABBAAAAABBAAABAAABBBAABABBBBBABABBAABBAAAAABAABBABAABBBABBBBB"
+states = ['A', 'B']
+
+transition_matrix, emission_matrix = hmm_parameter_estimation(x, sigma, pi, states)
+
+print("\t", "\t".join(states))
+for i, row in enumerate(transition_matrix):
+    print(states[i], "\t", "\t".join(f"{val:.3f}" for val in row))
+print("--------")
+print("\t", "\t".join(sigma))
+for i, row in enumerate(emission_matrix):
+    print(states[i], "\t", "\t".join(f"{val:.3f}" for val in row))
