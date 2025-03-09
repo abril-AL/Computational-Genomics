@@ -189,6 +189,7 @@ states = ['A', 'B']
 
 transition_matrix, emission_matrix = hmm_parameter_estimation(x, sigma, pi, states)
 
+'''
 print("\t", "\t".join(states))
 for i, row in enumerate(transition_matrix):
     print(states[i], "\t", "\t".join(f"{val:.3f}" for val in row))
@@ -196,3 +197,78 @@ print("--------")
 print("\t", "\t".join(sigma))
 for i, row in enumerate(emission_matrix):
     print(states[i], "\t", "\t".join(f"{val:.3f}" for val in row))
+'''
+
+# 10.12. Soft Decisions in Parameter Estimation: Q5
+import numpy as np
+
+def forward_algorithm(x, sigma, states, transition_matrix, emission_matrix):
+    num_states = len(states)
+    num_symbols = len(sigma)
+    T = len(x)
+    
+    # init fwd
+    forward = np.zeros((T, num_states))
+    
+    # init
+    for k in range(num_states):
+        forward[0, k] = emission_matrix[k, sigma.index(x[0])]
+    
+    # recursive step
+    for i in range(1, T):
+        for k in range(num_states):
+            forward[i, k] = sum(forward[i-1, j] * transition_matrix[j, k] for j in range(num_states)) * emission_matrix[k, sigma.index(x[i])]
+    
+    return forward
+
+def backward_algorithm(x, sigma, states, transition_matrix, emission_matrix):
+    num_states = len(states)
+    num_symbols = len(sigma)
+    T = len(x)
+    
+    # init bwd
+    backward = np.zeros((T, num_states))
+    
+    # inti 
+    backward[T-1, :] = 1
+    
+    # recursive step
+    for i in range(T-2, -1, -1):
+        for k in range(num_states):
+            backward[i, k] = sum(transition_matrix[k, j] * emission_matrix[j, sigma.index(x[i+1])] * backward[i+1, j] for j in range(num_states))
+    
+    return backward
+
+def soft_decoding(x, sigma, states, transition_matrix, emission_matrix):
+    num_states = len(states)
+    T = len(x)
+    
+    # fwd
+    forward_probs = forward_algorithm(x, sigma, states, transition_matrix, emission_matrix)
+    
+    # bwd
+    backward_probs = backward_algorithm(x, sigma, states, transition_matrix, emission_matrix)
+    
+    # soft decoding Pr
+    soft_decoding_probs = np.zeros((T, num_states))
+    
+    for i in range(T):
+        denominator = sum(forward_probs[i, k] * backward_probs[i, k] for k in range(num_states))
+        for k in range(num_states):
+            soft_decoding_probs[i, k] = (forward_probs[i, k] * backward_probs[i, k]) / denominator
+    
+    return soft_decoding_probs
+
+x = "zzyzxxxxxz"
+sigma = ['x', 'y', 'z']
+states = ['A', 'B', 'C', 'D']
+transition_matrix = np.array([[0.332,0.176,0.237,0.255], [0.157,0.325,0.117,0.401], [0.061,0.061,0.574,0.304],[0.566,0.09,0.188,0.156] ])
+emission_matrix = np.array([[0.48,0.489,0.031], [0.366,0.433,0.201], [0.091,0.365,0.544], [0.343,0.41,0.247]])
+
+soft_decoding_probs = soft_decoding(x, sigma, states, transition_matrix, emission_matrix)
+
+'''
+print("\t", "\t".join(states))
+for i in range(len(x)):
+    print(f"{soft_decoding_probs[i, 0]:.4f}\t{soft_decoding_probs[i, 1]:.4f}")
+'''
