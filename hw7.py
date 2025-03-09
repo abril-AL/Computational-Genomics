@@ -93,3 +93,46 @@ emission = np.array([
 
 output = viterbi_algorithm(x, alphabet, states, transition, emission)
 #print(output)
+
+# 10.7 Solve the Outcome Likelihood Problem.
+import numpy as np
+def outcome_likelihood(x, alphabet, states, transition, emission):
+    state_index = {state: i for i, state in enumerate(states)}
+    alphabet_index = {char: i for i, char in enumerate(alphabet)}
+    
+    num_states = len(states)
+    num_obs = len(x)
+    
+    # init fwd table
+    forward = np.zeros((num_states, num_obs))
+    
+    # first observation
+    for state in range(num_states):
+        forward[state, 0] = (1 / num_states) * emission[state, alphabet_index[x[0]]]
+    
+    # fill in the forward table 
+    for i in range(1, num_obs):
+        for k in range(num_states):
+            forward[k, i] = sum(forward[l, i-1] * transition[l, k] * emission[k, alphabet_index[x[i]]] for l in range(num_states))
+    
+    # sum the probabilities for all states 
+    probability = np.sum(forward[:, -1])
+    
+    return probability
+
+x = "zyyzzyyxxzxyzzxzyxyzyzxxzzyxyyzxxxyyzxzzzxxyzxyyxxzyxyxxyyxzzyzzyyxyzyyzzyyzzyzyyxyyyzxxxyyxzxyxzyyx"
+alphabet = ['x', 'y', 'z']
+states = ['A', 'B', 'C']
+transition = np.array([
+    [0.203,0.665,0.132],  
+    [0.461,0.406,0.133],  
+    [0.133,0.515,0.352]
+])
+emission = np.array([
+    [0.135,0.448,0.417],  
+    [0.542,0.205,0.253],  
+    [0.62,0.226,0.154]
+])
+
+output = outcome_likelihood(x, alphabet, states, transition, emission)
+print(output)
